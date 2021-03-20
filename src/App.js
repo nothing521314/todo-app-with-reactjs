@@ -14,7 +14,7 @@ function App () {
       data.key = generateKey();
       arr.push(data)
     } else {
-      let index = findIndex(data.key)
+      let index = tasks.findIndex(task => task.key === data.key)
       arr[index] = data;
     }
     setTasks(arr)
@@ -23,21 +23,21 @@ function App () {
   }
 
   const onToggleForm = () => {
-    setIsDisplayForm(isDisplayForm = true);
+    setIsDisplayForm(true);
     setEditting(null)
   }
 
   const onShowForm = () => {
-    setIsDisplayForm(isDisplayForm = true);
+    setIsDisplayForm(true);
   }
 
   const onCloseForm = () => {
-    setIsDisplayForm(isDisplayForm = false);
+    setIsDisplayForm(false);
     setEditting(null);
   }
 
   const onUpdateStatus = (key) => {
-    let index = findIndex(key);
+    let index = tasks.findIndex(task => task.key === key);
     if (index !== -1) {
       tasks[index].status = !tasks[index].status;
       setTasks(tasks => [...tasks]);
@@ -46,13 +46,13 @@ function App () {
   }
 
   const onUpdateContent = (key) => {
-    let index = findIndex(key);
+    let index = tasks.findIndex(task => task.key === key);
       setEditting(tasks[index]);
       onShowForm();
-    }
+  }
 
   const onDelete = (key) => {
-    let index = findIndex(key);
+    let index = tasks.findIndex(task => task.key === key);
     if (index !== -1) {
       tasks.splice(index, 1);
       setTasks(tasks => [...tasks]);
@@ -60,19 +60,9 @@ function App () {
     onCloseForm();
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }
-  
-  const findIndex = (key) => {
-    let result = -1;
-    tasks.forEach((task, index) => {
-      if (task.key === key) {
-        result = index;
-      }
-    });
-    return result;
-  }
 
-  useEffect ( () => {
-    if (localStorage && localStorage.getItem("tasks")) {
+  useEffect (() => {
+    if (localStorage.getItem("tasks")) {
       setTasks(JSON.parse(localStorage.getItem("tasks")))
     }
   }, []) 
@@ -85,10 +75,7 @@ function App () {
     return createKey() + createKey() + "-" + createKey() + createKey() + "-" + createKey() + createKey() + createKey();
   } 
 
-  let elmForm = isDisplayForm ? <TaskForm closeForm={onCloseForm}
-                                          submitData={onSubmit}
-                                          editForm={editting}
-                                          />: "";
+  let elmForm = isDisplayForm ? <TaskForm closeForm={onCloseForm} submitData={onSubmit} editForm={editting}/>: "";
   
   return (
     <div className="container">
@@ -98,22 +85,14 @@ function App () {
         </div>
         {/* TaskForm */}
         {elmForm}
-        <div className={isDisplayForm === true ? "col-xs-8 col-sm-8 col-md-8 col-lg-8" : "col-xs-12 col-sm-12 col-md-12 col-lg-12"}>
+        <div className={isDisplayForm ? "col-xs-8 col-sm-8 col-md-8 col-lg-8" : "col-xs-12 col-sm-12 col-md-12 col-lg-12"}>
           
           <button type="button" className="btn btn-primary" onClick={onToggleForm}>Add Job</button>
           {/* TaskList */}
-          <TaskList exData={tasks} 
-                    updateStatus={onUpdateStatus} 
-                    onDeleteContent={onDelete}
-                    updateContent={onUpdateContent}/>
+          <TaskList exData={tasks} updateStatus={onUpdateStatus} onDeleteContent={onDelete} updateContent={onUpdateContent}/>
         </div>
-        
-        
       </div>
-      
     </div>
-    
-
   );
 }
 

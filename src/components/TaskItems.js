@@ -4,9 +4,9 @@ function TaskItems (props) {
     props.changeStatus(props.task.key)
   }
   
-    const changeContent = () => {
-      props.changeContent(props.task.key)
-    }
+  const changeContent = () => {
+    props.changeContent(props.task.key)
+  }
 
   const deleteContent = () => {
     props.deleteContent(props.task.key)

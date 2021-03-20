@@ -7,14 +7,21 @@ function TaskForm (props) {
     status: false
   })
 
+  let str2bool = (value) => {
+    if (value && typeof value === "string") {
+         if (value.toLowerCase() === "true") return true;
+         if (value.toLowerCase() === "false") return false;
+    }
+    return value;
+  }
+
   const handleOnChange = (event) => {
     const {name, value} = event.target;
-    setInputValue({...inputValue, [name]: value});
+    setInputValue({...inputValue, [name]: str2bool(value)});
   }
 
   const onSubmit = (event) => {
     event.preventDefault();
-    inputValue.status = (inputValue.status === true || inputValue.status === "true" ? true : false);
     props.submitData(inputValue);
     onCloseForm();
     onClear();
@@ -71,8 +78,8 @@ function TaskForm (props) {
                     className="form-control"
                     value={inputValue.status}
                     onChange={handleOnChange} >
-              <option value={true}>Active</option>
-              <option value={false}>Hide</option>
+              <option value={`${true}`}>Active</option>
+              <option value={`${false}`}>Hide</option>
             </select>
             <div className="mt-15 text-center">
               <button type="submit" className="btn btn-warning" onClick={onSubmit}>Submit</button>
