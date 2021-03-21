@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 function TaskForm (props) {
   const [inputValue, setInputValue] = useState({
-    key: "",
+    id: "",
     name: "",
     status: false
   })
@@ -30,13 +30,13 @@ function TaskForm (props) {
   useEffect ( () => {
     if (props.editForm) {
       setInputValue({
-        key: props.editForm.key,
+        id: props.editForm.id,
         name: props.editForm.name,
         status: props.editForm.status
       })
     } else if (!props.editForm) {
       setInputValue({
-        key: "",
+        id: "",
         name: "",
         status: false
       });

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import './App.css';
+
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
+import './App.css';
 
 function App () {
   let [tasks, setTasks] = useState([]);
@@ -9,17 +10,13 @@ function App () {
   let [editting, setEditting] = useState([]);
 
   const onSubmit = (data) => {
-    let arr = tasks
-    if (!data.key) {
-      data.key = generateKey();
-      arr.push(data)
-    } else {
-      let index = tasks.findIndex(task => task.key === data.key)
-      arr[index] = data;
-    }
-    setTasks(arr)
-    setEditting(null);
-    localStorage.setItem("tasks", JSON.stringify(arr));
+    fetch('http://localhost:3001/tasks/' + (data.id ? data.id : ''), {
+      method: data.id ? 'PUT' : 'POST',
+      body: JSON.stringify({name: data.name, status: data.status}),
+      headers: {"Content-type": "application/json; charset=UTF-8"}
+    })
+    .then(response => response.json())
+    fetchTasks();
   }
 
   const onToggleForm = () => {
@@ -32,51 +29,53 @@ function App () {
   }
 
   const onCloseForm = () => {
+    fetchTasks();
     setIsDisplayForm(false);
     setEditting(null);
   }
 
-  const onUpdateStatus = (key) => {
-    let index = tasks.findIndex(task => task.key === key);
-    if (index !== -1) {
-      tasks[index].status = !tasks[index].status;
-      setTasks(tasks => [...tasks]);
+  const onUpdateStatus = (id) => {
+    let index = tasks.findIndex(task => task.id === id);
+    let varStatus = {
+      id: id,
+      name: tasks[index].name,
+      status: !tasks[index].status
     }
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    fetch('http://localhost:3001/tasks/' + id, {
+      method: 'PUT',
+      body: JSON.stringify(varStatus),
+      headers: {"Content-type": "application/json; charset=UTF-8"}
+    })
+    .then(response => response.json())
+    fetchTasks();
   }
 
-  const onUpdateContent = (key) => {
-    let index = tasks.findIndex(task => task.key === key);
+  const onUpdateContent = (id) => {
+    let index = tasks.findIndex(task => task.id === id);
       setEditting(tasks[index]);
       onShowForm();
   }
 
-  const onDelete = (key) => {
-    let index = tasks.findIndex(task => task.key === key);
-    if (index !== -1) {
-      tasks.splice(index, 1);
-      setTasks(tasks => [...tasks]);
-    }
+  const onDelete = (id) => {
     onCloseForm();
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    fetch ("http://localhost:3001/tasks/" + id, {
+      method: "delete",
+      })
+      .then (response => response.json())
+    fetchTasks();
   }
 
+  const fetchTasks = async () => {
+    const response = await fetch("http://localhost:3001/tasks");
+    const tasks = await response.json();
+    setTasks(tasks);
+  };
+  
   useEffect (() => {
-    if (localStorage.getItem("tasks")) {
-      setTasks(JSON.parse(localStorage.getItem("tasks")))
-    }
-  }, []) 
-
-  function createKey ()  {
-    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-  }
-
-  function generateKey () {
-    return createKey() + createKey() + "-" + createKey() + createKey() + "-" + createKey() + createKey() + createKey();
-  } 
+    fetchTasks();
+  }, []);
 
   let elmForm = isDisplayForm ? <TaskForm closeForm={onCloseForm} submitData={onSubmit} editForm={editting}/>: "";
-  
   return (
     <div className="container">
       <div className="row">
