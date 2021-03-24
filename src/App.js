@@ -1,27 +1,34 @@
 import { useEffect, useState } from 'react';
-
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import './App.css';
 
-function App () {
-  let [tasks, setTasks] = useState([]);
-  let [isDisplayForm, setIsDisplayForm] = useState(false);
-  let [editting, setEditting] = useState([]);
+function App() {
+  const [tasks, setTasks] = useState([]);
+  const [isDisplayForm, setIsDisplayForm] = useState(false);
+  const [editting, setEditting] = useState([]);
 
   const onSubmit = (data) => {
-    fetch('http://localhost:3001/tasks/' + (data.id ? data.id : ''), {
+    fetch('http://localhost:3000/tasks/' + (data.id ? data.id : ''), {
       method: data.id ? 'PUT' : 'POST',
-      body: JSON.stringify({name: data.name, status: data.status}),
-      headers: {"Content-type": "application/json; charset=UTF-8"}
+      body: JSON.stringify({ name: data.name, status: data.status }),
+      headers: { "Content-type": "application/json; charset=UTF-8" }
     })
-    .then(response => response.json())
-    fetchTasks();
+      .then(response => response.json())
+      .then(response => {
+        if (data.id) {
+          let index = tasks.findIndex(task => task.id === data.id);
+          tasks[index] = response;
+          setTasks(tasks => [...tasks]);
+        } else {
+          setTasks(tasks => [...tasks, response]);
+        }
+      })
   }
 
   const onToggleForm = () => {
     setIsDisplayForm(true);
-    setEditting(null)
+    setEditting(null);
   }
 
   const onShowForm = () => {
@@ -29,7 +36,6 @@ function App () {
   }
 
   const onCloseForm = () => {
-    fetchTasks();
     setIsDisplayForm(false);
     setEditting(null);
   }
@@ -41,41 +47,53 @@ function App () {
       name: tasks[index].name,
       status: !tasks[index].status
     }
-    fetch('http://localhost:3001/tasks/' + id, {
+    fetch('http://localhost:3000/tasks/' + id, {
       method: 'PUT',
       body: JSON.stringify(varStatus),
-      headers: {"Content-type": "application/json; charset=UTF-8"}
+      headers: { "Content-type": "application/json; charset=UTF-8" }
     })
-    .then(response => response.json())
-    fetchTasks();
+      .then(response => response.json())
+      .then(response => {
+        tasks[index] = response;
+        setTasks(tasks => [...tasks]);
+      })
   }
 
   const onUpdateContent = (id) => {
     let index = tasks.findIndex(task => task.id === id);
-      setEditting(tasks[index]);
-      onShowForm();
+    setEditting(tasks[index]);
+    onShowForm();
   }
 
   const onDelete = (id) => {
+    let index = tasks.findIndex(task => task.id === id);
     onCloseForm();
-    fetch ("http://localhost:3001/tasks/" + id, {
+    fetch("http://localhost:3000/tasks/" + id, {
       method: "delete",
+    })
+      .then(response => response.json())
+      .then(response => {
+        tasks.splice(index, 1);
+        setTasks(tasks => [...tasks]);
       })
-      .then (response => response.json())
-    fetchTasks();
   }
 
-  const fetchTasks = async () => {
-    const response = await fetch("http://localhost:3001/tasks");
-    const tasks = await response.json();
-    setTasks(tasks);
-  };
-  
-  useEffect (() => {
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const response = await fetch("http://localhost:3000/tasks");
+      const tasks = await response.json();
+      setTasks(tasks);
+    };
     fetchTasks();
   }, []);
 
-  let elmForm = isDisplayForm ? <TaskForm closeForm={onCloseForm} submitData={onSubmit} editForm={editting}/>: "";
+  let elmForm = isDisplayForm ?
+    <TaskForm
+      closeForm={onCloseForm}
+      submitData={onSubmit}
+      editForm={editting}
+    /> : "";
+
   return (
     <div className="container">
       <div className="row">
@@ -85,10 +103,9 @@ function App () {
         {/* TaskForm */}
         {elmForm}
         <div className={isDisplayForm ? "col-xs-8 col-sm-8 col-md-8 col-lg-8" : "col-xs-12 col-sm-12 col-md-12 col-lg-12"}>
-          
           <button type="button" className="btn btn-primary" onClick={onToggleForm}>Add Job</button>
           {/* TaskList */}
-          <TaskList exData={tasks} updateStatus={onUpdateStatus} onDeleteContent={onDelete} updateContent={onUpdateContent}/>
+          <TaskList exData={tasks} updateStatus={onUpdateStatus} onDeleteContent={onDelete} updateContent={onUpdateContent} />
         </div>
       </div>
     </div>

@@ -1,3 +1,24 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "name": "Learn Javascript",
+      "status": true,
+      "id": 6
+    },
+    {
+      "id": 7,
+      "name": "Learn HTML",
+      "status": false
+    },
+    {
+      "name": "Learn CSS",
+      "status": false,
+      "id": 8
+    },
+    {
+      "name": "Learn ReacJS",
+      "status": true,
+      "id": 9
+    }
+  ]
 }

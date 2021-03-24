@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function TaskForm (props) {
+function TaskForm(props) {
   const [inputValue, setInputValue] = useState({
     id: "",
     name: "",
@@ -9,15 +9,15 @@ function TaskForm (props) {
 
   let str2bool = (value) => {
     if (value && typeof value === "string") {
-         if (value.toLowerCase() === "true") return true;
-         if (value.toLowerCase() === "false") return false;
+      if (value.toLowerCase() === "true") return true;
+      if (value.toLowerCase() === "false") return false;
     }
     return value;
   }
 
   const handleOnChange = (event) => {
-    const {name, value} = event.target;
-    setInputValue({...inputValue, [name]: str2bool(value)});
+    const { name, value } = event.target;
+    setInputValue({ ...inputValue, [name]: str2bool(value) });
   }
 
   const onSubmit = (event) => {
@@ -27,7 +27,7 @@ function TaskForm (props) {
     onClear();
   }
 
-  useEffect ( () => {
+  useEffect(() => {
     if (props.editForm) {
       setInputValue({
         id: props.editForm.id,
@@ -41,7 +41,7 @@ function TaskForm (props) {
         status: false
       });
     }
-  }, [props.editForm])
+  }, [props.editForm]);
 
   const onCloseForm = () => {
     props.closeForm();
@@ -53,7 +53,6 @@ function TaskForm (props) {
       status: false
     })
   }
-
 
   return (
     <div className="col-xs-4 col-sm-4 col-md-4 col-lg-4">
@@ -67,17 +66,20 @@ function TaskForm (props) {
           <form>
             <div className="form-group">
               <label>Name</label>
-              <input name="name" 
-                     className="form-control"
-                     value={inputValue.name}     
-                     onChange={handleOnChange}  
+              <input
+                name="name"
+                className="form-control"
+                value={inputValue.name}
+                onChange={handleOnChange}
               />
             </div>
             <label>Status</label>
-            <select name="status" 
-                    className="form-control"
-                    value={inputValue.status}
-                    onChange={handleOnChange} >
+            <select
+              name="status"
+              className="form-control"
+              value={inputValue.status}
+              onChange={handleOnChange}
+            >
               <option value={`${true}`}>Active</option>
               <option value={`${false}`}>Hide</option>
             </select>
@@ -89,9 +91,7 @@ function TaskForm (props) {
         </div>
       </div>
     </div>
-        
   )
-  
 }
 
 export default TaskForm;

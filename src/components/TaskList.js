@@ -1,7 +1,8 @@
 import TaskItems from "./TaskItems";
 
-function TaskList (props) {
+function TaskList(props) {
   const tasks = props.exData;
+
   return (
     <div className="row mt-15">
       <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -15,25 +16,23 @@ function TaskList (props) {
             </tr>
           </thead>
           <tbody>
-            {tasks.map ((task, index) => {
+            {tasks.map((task, index) => {
               return (
                 <TaskItems
                   key={task.id}
                   id={index}
                   task={task}
                   changeStatus={props.updateStatus}
-                  deleteContent={props.onDeleteContent} 
+                  deleteContent={props.onDeleteContent}
                   changeContent={props.updateContent}
                 />
               );
             })}
           </tbody>
         </table>
-        
       </div>
     </div>
   )
-  
 }
 
 export default TaskList;
