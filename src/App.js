@@ -41,8 +41,8 @@ function App() {
   }
 
   const onUpdateStatus = (id) => {
-    let index = tasks.findIndex(task => task.id === id);
-    let varStatus = {
+    const index = tasks.findIndex(task => task.id === id);
+    const varStatus = {
       id: id,
       name: tasks[index].name,
       status: !tasks[index].status
@@ -60,19 +60,19 @@ function App() {
   }
 
   const onUpdateContent = (id) => {
-    let index = tasks.findIndex(task => task.id === id);
+    const index = tasks.findIndex(task => task.id === id);
     setEditting(tasks[index]);
     onShowForm();
   }
 
   const onDelete = (id) => {
-    let index = tasks.findIndex(task => task.id === id);
+    const index = tasks.findIndex(task => task.id === id);
     onCloseForm();
     fetch("http://localhost:3000/tasks/" + id, {
       method: "delete",
     })
       .then(response => response.json())
-      .then(response => {
+      .finally(() => {
         tasks.splice(index, 1);
         setTasks(tasks => [...tasks]);
       })
@@ -103,9 +103,18 @@ function App() {
         {/* TaskForm */}
         {elmForm}
         <div className={isDisplayForm ? "col-xs-8 col-sm-8 col-md-8 col-lg-8" : "col-xs-12 col-sm-12 col-md-12 col-lg-12"}>
-          <button type="button" className="btn btn-primary" onClick={onToggleForm}>Add Job</button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={onToggleForm}
+          >Add Job</button>
           {/* TaskList */}
-          <TaskList exData={tasks} updateStatus={onUpdateStatus} onDeleteContent={onDelete} updateContent={onUpdateContent} />
+          <TaskList
+            exData={tasks}
+            updateStatus={onUpdateStatus}
+            onDeleteContent={onDelete}
+            updateContent={onUpdateContent}
+          />
         </div>
       </div>
     </div>

@@ -1,9 +1,9 @@
 {
   "tasks": [
     {
+      "id": 6,
       "name": "Learn Javascript",
-      "status": true,
-      "id": 6
+      "status": false
     },
     {
       "id": 7,
@@ -11,14 +11,14 @@
       "status": false
     },
     {
+      "id": 8,
       "name": "Learn CSS",
-      "status": false,
-      "id": 8
+      "status": false
     },
     {
+      "id": 9,
       "name": "Learn ReacJS",
-      "status": true,
-      "id": 9
+      "status": true
     }
   ]
 }
