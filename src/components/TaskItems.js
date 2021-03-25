@@ -1,25 +1,25 @@
-function TaskItems (props) {
-  
+function TaskItems(props) {
+
   const changeStatus = () => {
-    props.changeStatus(props.task.key)
+    props.changeStatus(props.task.id);
   }
-  
+
   const changeContent = () => {
-    props.changeContent(props.task.key)
+    props.changeContent(props.task.id);
   }
 
   const deleteContent = () => {
-    props.deleteContent(props.task.key)
+    props.deleteContent(props.task.id);
   }
 
   return (
     <tr>
-      <td className="text-center">{1 + props.id}</td>
+      <td className="text-center">{props.id + 1}</td>
       <td>{props.task.name}</td>
       <td className="text-center">
         <span className={props.task.status === true ? "label label-danger" : "label label-success"}
-              onClick={changeStatus}
-             >
+          onClick={changeStatus}
+        >
           {props.task.status === true ? "Active" : "Hidden"}
         </span>
       </td>
@@ -34,7 +34,7 @@ function TaskItems (props) {
       </td>
     </tr>
   )
-  
+
 }
 
 export default TaskItems;

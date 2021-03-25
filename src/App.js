@@ -1,30 +1,34 @@
 import { useEffect, useState } from 'react';
-import './App.css';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
+import './App.css';
 
-function App () {
-  let [tasks, setTasks] = useState([]);
-  let [isDisplayForm, setIsDisplayForm] = useState(false);
-  let [editting, setEditting] = useState([]);
+function App() {
+  const [tasks, setTasks] = useState([]);
+  const [isDisplayForm, setIsDisplayForm] = useState(false);
+  const [editting, setEditting] = useState([]);
 
   const onSubmit = (data) => {
-    let arr = tasks
-    if (!data.key) {
-      data.key = generateKey();
-      arr.push(data)
-    } else {
-      let index = tasks.findIndex(task => task.key === data.key)
-      arr[index] = data;
-    }
-    setTasks(arr)
-    setEditting(null);
-    localStorage.setItem("tasks", JSON.stringify(arr));
+    fetch('http://localhost:3000/tasks/' + (data.id ? data.id : ''), {
+      method: data.id ? 'PUT' : 'POST',
+      body: JSON.stringify({ name: data.name, status: data.status }),
+      headers: { "Content-type": "application/json; charset=UTF-8" }
+    })
+      .then(response => response.json())
+      .then(response => {
+        if (data.id) {
+          let index = tasks.findIndex(task => task.id === data.id);
+          tasks[index] = response;
+          setTasks(tasks => [...tasks]);
+        } else {
+          setTasks(tasks => [...tasks, response]);
+        }
+      })
   }
 
   const onToggleForm = () => {
     setIsDisplayForm(true);
-    setEditting(null)
+    setEditting(null);
   }
 
   const onShowForm = () => {
@@ -36,47 +40,60 @@ function App () {
     setEditting(null);
   }
 
-  const onUpdateStatus = (key) => {
-    let index = tasks.findIndex(task => task.key === key);
-    if (index !== -1) {
-      tasks[index].status = !tasks[index].status;
-      setTasks(tasks => [...tasks]);
+  const onUpdateStatus = (id) => {
+    const index = tasks.findIndex(task => task.id === id);
+    const varStatus = {
+      id: id,
+      name: tasks[index].name,
+      status: !tasks[index].status
     }
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    fetch('http://localhost:3000/tasks/' + id, {
+      method: 'PUT',
+      body: JSON.stringify(varStatus),
+      headers: { "Content-type": "application/json; charset=UTF-8" }
+    })
+      .then(response => response.json())
+      .then(response => {
+        tasks[index] = response;
+        setTasks(tasks => [...tasks]);
+      })
   }
 
-  const onUpdateContent = (key) => {
-    let index = tasks.findIndex(task => task.key === key);
-      setEditting(tasks[index]);
-      onShowForm();
+  const onUpdateContent = (id) => {
+    const index = tasks.findIndex(task => task.id === id);
+    setEditting(tasks[index]);
+    onShowForm();
   }
 
-  const onDelete = (key) => {
-    let index = tasks.findIndex(task => task.key === key);
-    if (index !== -1) {
-      tasks.splice(index, 1);
-      setTasks(tasks => [...tasks]);
-    }
+  const onDelete = (id) => {
+    const index = tasks.findIndex(task => task.id === id);
     onCloseForm();
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    fetch("http://localhost:3000/tasks/" + id, {
+      method: "delete",
+    })
+      .then(response => response.json())
+      .finally(() => {
+        tasks.splice(index, 1);
+        setTasks(tasks => [...tasks]);
+      })
   }
 
-  useEffect (() => {
-    if (localStorage.getItem("tasks")) {
-      setTasks(JSON.parse(localStorage.getItem("tasks")))
-    }
-  }, []) 
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const response = await fetch("http://localhost:3000/tasks");
+      const tasks = await response.json();
+      setTasks(tasks);
+    };
+    fetchTasks();
+  }, []);
 
-  function createKey ()  {
-    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-  }
+  let elmForm = isDisplayForm ?
+    <TaskForm
+      closeForm={onCloseForm}
+      submitData={onSubmit}
+      editForm={editting}
+    /> : "";
 
-  function generateKey () {
-    return createKey() + createKey() + "-" + createKey() + createKey() + "-" + createKey() + createKey() + createKey();
-  } 
-
-  let elmForm = isDisplayForm ? <TaskForm closeForm={onCloseForm} submitData={onSubmit} editForm={editting}/>: "";
-  
   return (
     <div className="container">
       <div className="row">
@@ -86,10 +103,18 @@ function App () {
         {/* TaskForm */}
         {elmForm}
         <div className={isDisplayForm ? "col-xs-8 col-sm-8 col-md-8 col-lg-8" : "col-xs-12 col-sm-12 col-md-12 col-lg-12"}>
-          
-          <button type="button" className="btn btn-primary" onClick={onToggleForm}>Add Job</button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={onToggleForm}
+          >Add Job</button>
           {/* TaskList */}
-          <TaskList exData={tasks} updateStatus={onUpdateStatus} onDeleteContent={onDelete} updateContent={onUpdateContent}/>
+          <TaskList
+            exData={tasks}
+            updateStatus={onUpdateStatus}
+            onDeleteContent={onDelete}
+            updateContent={onUpdateContent}
+          />
         </div>
       </div>
     </div>

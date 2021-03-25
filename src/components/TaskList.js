@@ -1,18 +1,7 @@
 import TaskItems from "./TaskItems";
 
-function TaskList (props) {
-
+function TaskList(props) {
   const tasks = props.exData;
-
-  let elmTask = tasks.map ((task, index) => {
-    return <TaskItems key={task.key}
-                      id={index}
-                      task={task}
-                      changeStatus={props.updateStatus}
-                      deleteContent={props.onDeleteContent} 
-                      changeContent={props.updateContent}
-            />
-  })
 
   return (
     <div className="row mt-15">
@@ -27,15 +16,23 @@ function TaskList (props) {
             </tr>
           </thead>
           <tbody>
-            {/* TaskItems */}
-           {elmTask}
+            {tasks.map((task, index) => {
+              return (
+                <TaskItems
+                  key={task.id}
+                  id={index}
+                  task={task}
+                  changeStatus={props.updateStatus}
+                  deleteContent={props.onDeleteContent}
+                  changeContent={props.updateContent}
+                />
+              );
+            })}
           </tbody>
         </table>
-        
       </div>
     </div>
   )
-  
 }
 
 export default TaskList;
